@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='logo2.ico') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% if title %}
+    <title>{{title}} - ThreatHound </title>
+    {% else %}
+    <title>ThreatHound </title>
+    {% endif %}
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- ... (other head elements) ... -->
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
+    <script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.7.0.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js
+"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+<!-- Include Bootstrap Icons for the icons used -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.4.0/font/bootstrap-icons.min.css" integrity="sha384-kptqE/ZQnijVjQjSAxY9sWENj1gOV7FyA7snh7jJp/w5VdO0HHBfOedGFiO3epnZ" crossorigin="anonymous">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh);
+        }
+      .datatable1 th:nth-child(1), .datatable1 td:nth-child(1) { width: 33%; } /* Column 1: 20% width */
+      .datatable1 th:nth-child(2), .datatable1 td:nth-child(2) { width: 67%; } /* Column 2: 50% width */
+      .datatable2 th:nth-child(1), .datatable2 td:nth-child(1) { width: 10%; } /* Column 1: 20% width */
+      .datatable2 th:nth-child(2), .datatable2 td:nth-child(2) { width: 2%; } /* Column 2: 50% width */
+      .datatable2 th:nth-child(3), .datatable2 td:nth-child(3) { width: 10%; } /* Column 1: 20% width */
+      .datatable2 th:nth-child(4), .datatable2 td:nth-child(4) { width: 22%; overflow-wrap: anywhere; } /* Column 2: 50% width */
+      .datatable2 th:nth-child(5), .datatable2 td:nth-child(5) { width: 0%; } /* Column 1: 20% width */
+       
+      #table3_filter input {
+        width: 100%;
+        margin: auto;
+      }
+      
+      .container { 
+        flex: 1;
+        width: 98%; 
+        margin: 10px auto; 
+        background: #fff; 
+        padding: 10px; 
+        box-shadow: 0 0 10px rgba(0,0,0,0.1); 
+      }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tr:hover {
+            background-color: #ddd;
+        }
+
+        .tdfirst {
+            display: flex;
+        }
+
+        .table1{
+            width: 100% !important;
+        }
+        .table2{
+            width: 100% !important;
+        }
+
+        .tblStyle {
+          max-height: 100vh;
+          overflow-y: auto;
+          background-color: rgb(255 255 255 / 9%);
+          top: 50%;
+          left: 50%;
+          border-radius: 10px;
+          backdrop-filter: blur(10px);
+          border: 2px solid rgba(255,255,255,0.1);
+          box-shadow: 0 0 10px rgb(234 235 244);
+          padding: 50px 35px;
+          margin: 0;
+          height: 100vh;
+          color: white;
+        }
+        .tblStyle::before {
+          content: '';
+          /* position: absolute; */
+          top: 0;
+          right: 0;
+          bottom: 0;
+          left: 0;
+          background-color: rgba(255,255,255,0.01);
+          /* color: white; */
+          /* background-image: url(/static/back.jpg); */
+          background-size: cover;
+          background-position: center center;
+          /* filter: blur(8px); */
+          opacity: 0.5;
+        }
+
+        #table1_length{
+              float: left!important;
+        }
+        .dropdown-menu-dark {
+  background-color: #333; /* Dark background */
+  color: white;
+}
+
+.dropdown-menu-dark .dropdown-item {
+  color: white;
+}
+
+.dropdown-menu-dark .dropdown-item:hover {
+  background-color: #555; /* Slightly lighter for hover state */
+}
+
+.dropdown-header {
+  color: #ddd; /* Lighter text color for the header */
+  padding: 10px 20px; /* Adjust padding as needed */
+}
+
+.dropdown-item i {
+  margin-right: 5px; /* Space between icon and text */
+}
+
+/* Custom badges */
+.badge.bg-primary {
+  margin-left: 5px;
+  background-color: #0082c8; /* Example primary color */
+}
+
+.badge.bg-secondary {
+  background-color: #6c757d; /* Example secondary color */
+}
+
+.my-2 {
+  max-height: 100px !important;
+}
+
+/* Custom divider */
+.dropdown-divider {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+  border-top: 1px solid #444; /* Darker border color */
+}
+.btnGroup{
+  box-shadow: 0 0 10px rgb(234 235 244);
+}
+
+        .dataTables_filter input {
+            color: #555; /* Dark grey text */
+            background-color: #f0f0f0; /* Light grey background */
+        }
+        .dataTables_length select {
+            color: #555; /* Dark grey text */
+            background-color: #f0f0f0; /* Light grey background */
+        }
+.selected {
+    background-color: #a8d5ff; /* Choose your highlight color */
+    color: #000000; /* Optional: Change text color if needed */
+}
+    </style>
+
+</head>
+
+<body class="bg-dark">
+    <div class="container-fluid my-2">
+        <div class="d-flex justify-content-between align-items-center mx-3">
+            <div class="d-flex justify-content-start align-items-center">
+                <img class="rounded-circle" style="width: 22%;"
+                src="{{ url_for('static', filename='logo2.png') }}"
+                alt="logo">
+                <div class="display-4 text-white">ThreatHound</div>
+            </div>
+            <!-- Bootstrap 5 Dropdown -->
+            <div class="dropdown">
+              <!-- Dropdown Button -->
+              <button class="btn dropdown-toggle text-white" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false" title="{{session.username}}" >
+                {% if session.get('user_id') %}
+                <svg style="fill:white" height="50" viewBox="0 0 32 32" width="50" xmlns="http://www.w3.org/2000/svg"><path d="m16 8a5 5 0 1 0 5 5 5 5 0 0 0 -5-5zm0 8a3 3 0 1 1 3-3 3.0034 3.0034 0 0 1 -3 3z"/><path d="m16 2a14 14 0 1 0 14 14 14.0158 14.0158 0 0 0 -14-14zm-6 24.3765v-1.3765a3.0033 3.0033 0 0 1 3-3h6a3.0033 3.0033 0 0 1 3 3v1.3765a11.8989 11.8989 0 0 1 -12 0zm13.9925-1.4507a5.0016 5.0016 0 0 0 -4.9925-4.9258h-6a5.0016 5.0016 0 0 0 -4.9925 4.9258 12 12 0 1 1 15.985 0z"/><path d="m0 0h32v32h-32z" fill="none"/></svg>
+                
+                {% endif %}
+              </button>
+              
+              <!-- Dropdown Menu -->
+              <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownMenuButton">
+                <!-- Dropdown Items -->
+                <li><a class="dropdown-item" href="/user/dashboard/runtime"><i class="bi bi-person"></i> Dashboard</a></li>
+                <li><a class="dropdown-item" href="/user/update-profile"><i class="bi bi-camera"></i> Update Profile</a></li>
+                <li><a class="dropdown-item" href="/user/change-password"><i class="bi bi-gear"></i> Change Password</a></li>
+                <li><a class="dropdown-item" href="/user/logout"><i class="bi bi-palette"></i> Logout</a></li>
+              </ul>
+            </div>
+        </div>
+
+
+    </div>
+    <!--
+    <div class="text-center my-2">
+        {% if session.get('user_id') %}
+        <button class="btn btn-info">{{session.username}}</button>
+        {% endif %}
+    </div>
+    <hr>
+    -->
+    {% block content %} {% endblock content %}
+</body>
+
+</html>

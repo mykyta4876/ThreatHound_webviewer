@@ -1,0 +1,158 @@
+{% extends 'admin/layout.html' %}
+{% block content %}
+
+<div class="container">
+    <h3 class="text-center my-3">
+        SigmaRule
+    </h3>
+    <div class="row d-flex justify-content-center">
+        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="bg-white container p-3 rounded-pill text-dark mb-4 border border-2 btnGroup">
+                        <div class="d-flex justify-content-center align-items-center mx-auto grid grid-cols-4 gap-4">
+                            <div style="display: inline;">
+                                <div class = "grid grid-cols-2 gap-8">
+                                    <input class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" aria-describedby="file_input_help" id="folderInput" type="file"  webkitdirectory directory multiple>
+                                    <button onclick="uploadFolder()" class="btn btn-success" >Upload Folder</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="border border-2" style="padding: 10px; ">
+                                    <div class="tblStyle" style="margin: 10px;">
+                                        <!-- First DataTable -->
+                                        <table id="table1" class="table1 table-bordered align-items-center">
+                                            <thead>
+                                                <tr>
+                                                    <th>ID</th>
+                                                    <th>Enable</th>
+                                                    <th>RuleName</th>
+                                                    <!-- Add more columns as needed -->
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for row in table1_data %}
+                                                <tr>
+                                                    <td>{{ row.id }}</td>
+                                                    <td>
+                                                        {% if (row.enable == true ) %}
+                                                        <input type="checkbox" checked>
+                                                        {% else %}
+                                                        <input type="checkbox">
+                                                        {% endif %}
+                                                    </td>
+                                                    <td>{{ row.title }}</td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>               
+                            </div>
+                        </div>
+                        <div style="margin-top:15px; display:flex; float: right;">
+                            <button onclick="Save()" class="btn btn-success" >Save</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function uploadFolder() {
+        const folderInput = document.getElementById('folderInput');
+        const files = folderInput.files;
+
+        if (files.length === 0) {
+            alert('Please select a folder.');
+            return;
+        }
+
+        const formData = new FormData();
+
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            formData.append('files[]', file, file.webkitRelativePath);
+        }
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', '/admin/upload_folder', true);
+        xhr.setRequestHeader('enctype', 'multipart/form-data');
+
+        xhr.onreadystatechange = function(event) {
+            if (this.readyState == 4 && this.status == 200) {
+                setTimeout(() => location.href = '/admin/sigmarule', 1000)
+            }
+        };
+
+        xhr.onprogress = (event) => {
+            if (event.lengthComputable) {
+                const loaded = event.loaded;
+                const total = event.total;
+                $(".progress-bar").attr('style', `width: ${total / loaded * 100}%`);
+            }
+        };
+
+        $(".progress").attr("style", '')
+        xhr.send(formData);
+    }
+    function Save() {
+        // Get the table reference
+        var table = document.getElementById("table1");
+
+        // Initialize an array to store JSON objects
+        var jsonData = [];
+
+        // Iterate through rows (skip the header row)
+        for (var i = 1; i < table.rows.length; i++) {
+            var row = table.rows[i];
+            var dataObject = {};
+
+            // Iterate through cells
+            for (var j = 0; j < row.cells.length; j++) {
+                var cell = row.cells[j];
+                var headerText = table.rows[0].cells[j].textContent.trim();
+                if (j == 1) {
+                    dataObject["enable"] = cell.children[0].checked;
+                } else {                   
+                    dataObject["enable"] = cell.textContent.trim();
+                }
+            }
+
+            // Add the data object to the array
+            jsonData.push(dataObject);
+        }
+
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', '/admin/save_changed', true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+
+        xhr.onreadystatechange = function(event) {
+            if (this.readyState == 4 && this.status == 200) {
+                setTimeout(() => location.href = '/admin/sigmarule', 1000)
+            }
+        };
+
+        xhr.send(JSON.stringify(jsonData));
+    }
+
+    $(document).ready(function() {
+        // Initialize DataTables
+        var table1 = $('#table1').DataTable();
+
+        // Handle row click in the first table
+        $('#table1 tbody').on('click', 'tr', function() {
+            if ($(this).hasClass('selected')) {
+                $(this).removeClass('selected');
+            } else {
+                table1.$('tr.selected').removeClass('selected');
+                $(this).addClass('selected');
+            }
+        });
+    });
+</script>
+{% endblock content %}

@@ -1,0 +1,11 @@
+{
+  "data_log\\fvi89VRBDNQDdi2L6t8hKPuT2tUtnZ\\static\\Command_and_Control_ACL_ForcePwd_SPNAdd_User_Computer_Accounts.evtx": 1709471137.7624412,
+  "data_log\\fvi89VRBDNQDdi2L6t8hKPuT2tUtnZ\\static\\Command_and_Control_bits_openvpn.evtx": 1709471137.7644336,
+  "data_log\\fvi89VRBDNQDdi2L6t8hKPuT2tUtnZ\\static\\Command_and_Control_DE_RDP_Tunneling_4624.evtx": 1709471137.7644336,
+  "data_log\\fvi89VRBDNQDdi2L6t8hKPuT2tUtnZ\\static\\Command_and_Control_DE_RDP_Tunneling_TerminalServices-RemoteConnectionManagerOperational_1149.evtx": 1709471137.7654312,
+  "data_log\\fvi89VRBDNQDdi2L6t8hKPuT2tUtnZ\\static\\Command_and_Control_DE_RDP_Tunnel_5156.evtx": 1709471137.766427,
+  "data_log\\fvi89VRBDNQDdi2L6t8hKPuT2tUtnZ\\static\\Command_and_Control_DE_sysmon-3-rdp-tun.evtx": 1709471137.766427,
+  "data_log\\fvi89VRBDNQDdi2L6t8hKPuT2tUtnZ\\static\\Command_and_Control_PanacheSysmon_vs_AtomicRedTeam01.evtx": 1709471137.7674243,
+  "data_log\\fvi89VRBDNQDdi2L6t8hKPuT2tUtnZ\\static\\Command_and_Control_panache_sysmon_vs_EDRTestingScript.evtx": 1709471137.769417,
+  "data_log\\fvi89VRBDNQDdi2L6t8hKPuT2tUtnZ\\static\\Command_and_Control_tunna_iis_rdp_smb_tunneling_sysmon_3.evtx": 1709471137.769417
+}

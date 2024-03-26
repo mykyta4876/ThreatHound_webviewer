@@ -1,0 +1,82 @@
+{% extends "admin/layout.html"%}
+
+{% block content %}
+<div class="container">
+    <div class="my-2">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="table1">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Token</th>
+                        <th>Status</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td>{{user.id}}</td>
+                        <td>{{user.fname}}</td>
+                        <td>{{user.lname}}</td>
+                        <td>{{user.username}}</td>
+                        <td>{{user.email}}</td>
+                        <td>{{user.token}}</td>
+                        <td>
+                            {% if user.status == 1 %}
+                            Approved
+                            {% else %}
+                            <a href="/admin/approve-user/{{user.id}}">
+                                <button class="btn btn-warning">Approve</button>
+                            </a>
+                            {% endif %}
+                        </td>
+                        <td><button class='deleteBtn'>Delete</button></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+
+    $(document).ready(function() {
+        var table1 = $('#table1').DataTable();
+    });
+
+    $('#table1 tbody').on('click', '.deleteBtn', function () {
+        //alert("Are you confirm to delete the user?");
+
+        var table = $('#table1').DataTable();
+        /*
+        table
+            .row($(this).parents('tr'))
+            .remove()
+            .draw();
+        */
+        var row = $(this).closest('tr');
+        var row_data = table.row(row).data();
+
+        $.ajax({
+            url: '/admin/delete_user',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ id: row_data[0] }), // Replace 'userId' with the actual user ID
+            success: function(response) {
+                // This function is called if the request succeeds
+                // 'response' contains the data returned from the server
+                table.row(row).remove().draw();
+            },
+            error: function(xhr, status, error) {
+                // This function is called if the request fails
+                console.log('Error:', error);
+            }
+        });
+    });
+</script>
+{% endblock content %}

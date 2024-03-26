@@ -1,0 +1,224 @@
+[
+  {
+    "RuleName": "Execution of Suspicious File Type Extension",
+    "Counts": 272,
+    "FalsePositives": "['Unknown']",
+    "RuleId": 0
+  },
+  {
+    "RuleName": "Exfiltration and Tunneling Tools Execution",
+    "Counts": 1,
+    "FalsePositives": "['Legitimate Administrator using tools']",
+    "RuleId": 1
+  },
+  {
+    "RuleName": "Suspicious Plink Port Forwarding",
+    "Counts": 1,
+    "FalsePositives": "['Administrative activity using a remote port forwarding to a local port']",
+    "RuleId": 2
+  },
+  {
+    "RuleName": "Potential Remote Desktop Tunneling",
+    "Counts": 1,
+    "FalsePositives": "['Unknown']",
+    "RuleId": 3
+  },
+  {
+    "RuleName": "HybridConnectionManager Service Installation - Registry",
+    "Counts": 38,
+    "FalsePositives": "['Unknown']",
+    "RuleId": 4
+  },
+  {
+    "RuleName": "Narrator's Feedback-Hub Persistence",
+    "Counts": 38,
+    "FalsePositives": "['Unknown']",
+    "RuleId": 5
+  },
+  {
+    "RuleName": "New Service Creation Using Sc.EXE",
+    "Counts": 1,
+    "FalsePositives": "['Legitimate administrator or user creates a service for legitimate reasons.', 'Software installation']",
+    "RuleId": 6
+  },
+  {
+    "RuleName": "Files And Subdirectories Listing Using Dir",
+    "Counts": 4,
+    "FalsePositives": "['Unknown']",
+    "RuleId": 7
+  },
+  {
+    "RuleName": "Pubprn.vbs Proxy Execution",
+    "Counts": 4,
+    "FalsePositives": "['Unknown']",
+    "RuleId": 8
+  },
+  {
+    "RuleName": "Sticky Key Like Backdoor Usage - Registry",
+    "Counts": 5,
+    "FalsePositives": "['Unlikely']",
+    "RuleId": 9
+  },
+  {
+    "RuleName": "Automated Collection Command Prompt",
+    "Counts": 2,
+    "FalsePositives": "['Unknown']",
+    "RuleId": 10
+  },
+  {
+    "RuleName": "Suspicious Scan Loop Network",
+    "Counts": 1,
+    "FalsePositives": "['Legitimate script']",
+    "RuleId": 11
+  },
+  {
+    "RuleName": "PowerShell Initiated Network Connection",
+    "Counts": 4,
+    "FalsePositives": "['Administrative scripts', 'Microsoft IP range', \"Additional filters are required. Adjust to your environment (e.g. extend filters with company's ip range')\"]",
+    "RuleId": 12
+  },
+  {
+    "RuleName": "Suspicious mshta.exe Detected",
+    "Counts": 1,
+    "FalsePositives": "",
+    "RuleId": 13
+  },
+  {
+    "RuleName": "Potentially Suspicious PowerShell Child Processes",
+    "Counts": 2,
+    "FalsePositives": "['Some false positive is to be expected from PowerShell scripts that might make use of additional binaries such as \"mshta\", \"bitsadmin\", etc. Apply additional filters for those scripts when needed.']",
+    "RuleId": 14
+  },
+  {
+    "RuleName": "Scripting/CommandLine Process Spawned Regsvr32",
+    "Counts": 5,
+    "FalsePositives": "['Legitimate \".bat\", \".hta\", \".ps1\" or \".vbs\" scripts leverage legitimately often. Apply additional filter and exclusions as necessary', 'Some legitimate Windows services']",
+    "RuleId": 15
+  },
+  {
+    "RuleName": "Network Connection Initiated By Regsvr32.EXE",
+    "Counts": 2,
+    "FalsePositives": "['Unknown']",
+    "RuleId": 16
+  },
+  {
+    "RuleName": "Potentially Suspicious Child Process Of Regsvr32",
+    "Counts": 3,
+    "FalsePositives": "['Unlikely, but can rarely occur. Apply additional filters accordingly.']",
+    "RuleId": 17
+  },
+  {
+    "RuleName": "Potential Regsvr32 Commandline Flag Anomaly",
+    "Counts": 3,
+    "FalsePositives": "['Administrator typo might cause some false positives']",
+    "RuleId": 18
+  },
+  {
+    "RuleName": "Suspicious Network Command",
+    "Counts": 1,
+    "FalsePositives": "['Administrator, hotline ask to user']",
+    "RuleId": 19
+  },
+  {
+    "RuleName": "Interactive AT Job",
+    "Counts": 1,
+    "FalsePositives": "['Unlikely (at.exe deprecated as of Windows 8)']",
+    "RuleId": 20
+  },
+  {
+    "RuleName": "Mavinject Inject DLL Into Running Process",
+    "Counts": 1,
+    "FalsePositives": "['Unknown']",
+    "RuleId": 21
+  },
+  {
+    "RuleName": "Suspicious Encoded Scripts in a WMI Consumer",
+    "Counts": 6,
+    "FalsePositives": "['Unknown']",
+    "RuleId": 22
+  },
+  {
+    "RuleName": "Potential Persistence Via Logon Scripts - CommandLine",
+    "Counts": 2,
+    "FalsePositives": "['Legitimate addition of Logon Scripts via the command line by administrators or third party tools']",
+    "RuleId": 23
+  },
+  {
+    "RuleName": "Potential Execution of Sysinternals Tools",
+    "Counts": 1,
+    "FalsePositives": "['Legitimate use of SysInternals tools', 'Programs that use the same command line flag']",
+    "RuleId": 24
+  },
+  {
+    "RuleName": "Potential LSASS Process Dump Via Procdump",
+    "Counts": 1,
+    "FalsePositives": "['Unlikely, because no one should dump an lsass process memory', 'Another tool that uses command line flags similar to ProcDump']",
+    "RuleId": 25
+  },
+  {
+    "RuleName": "Potential Credential Dumping Attempt Via PowerShell",
+    "Counts": 1,
+    "FalsePositives": "['Unknown']",
+    "RuleId": 26
+  },
+  {
+    "RuleName": "Use of Pcalua For Execution",
+    "Counts": 3,
+    "FalsePositives": "['Legitimate use by a via a batch script or by an administrator.']",
+    "RuleId": 27
+  },
+  {
+    "RuleName": "PowerShell Web Download",
+    "Counts": 2,
+    "FalsePositives": "['Scripts or tools that download files']",
+    "RuleId": 28
+  },
+  {
+    "RuleName": "PowerShell Download and Execution Cradles",
+    "Counts": 2,
+    "FalsePositives": "['Some PowerShell installers were seen using similar combinations. Apply filters accordingly']",
+    "RuleId": 29
+  },
+  {
+    "RuleName": "Usage Of Web Request Commands And Cmdlets",
+    "Counts": 4,
+    "FalsePositives": "['Use of Get-Command and Get-Help modules to reference Invoke-WebRequest and Start-BitsTransfer.']",
+    "RuleId": 30
+  },
+  {
+    "RuleName": "Suspicious Execution of InstallUtil Without Log",
+    "Counts": 1,
+    "FalsePositives": "['Unknown']",
+    "RuleId": 31
+  },
+  {
+    "RuleName": "Potential Persistence Via Netsh Helper DLL",
+    "Counts": 1,
+    "FalsePositives": "['Unknown']",
+    "RuleId": 32
+  },
+  {
+    "RuleName": "Suspicious Calculator Usage",
+    "Counts": 2,
+    "FalsePositives": "['Unknown']",
+    "RuleId": 33
+  },
+  {
+    "RuleName": "Scheduled Task Creation",
+    "Counts": 1,
+    "FalsePositives": "['Administrative activity', 'Software installation']",
+    "RuleId": 34
+  },
+  {
+    "RuleName": "Mshtml DLL RunHTMLApplication Abuse",
+    "Counts": 4,
+    "FalsePositives": "['Unlikely']",
+    "RuleId": 35
+  },
+  {
+    "RuleName": "Suspicious Rundll32 Script in CommandLine",
+    "Counts": 4,
+    "FalsePositives": "['False positives depend on scripts and administrative tools used in the monitored environment']",
+    "RuleId": 36
+  }
+]

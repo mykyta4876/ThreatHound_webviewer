@@ -1,0 +1,453 @@
+{% extends "user/layout.html"%}
+
+{% block content %}
+<!--
+<div class="container">
+    {% with messages=get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category,message in messages %}
+    <div class="alert alert-{{category}}">
+        <strong>{{message}}</strong>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+</div>
+-->
+<script>
+$(document).ready(function(){
+    $(".toast").toast({
+        autohide: true
+    });
+});
+</script>
+    {% with messages=get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category,message in messages %}
+    <div class="toast-container" style="position: absolute; top: 10px; right: 10px;">
+        <div class="toast fade show">
+            <div class="toast-header">
+                <strong class="me-auto"><i class="bi-globe"></i> Notice</strong>
+                <small>just now</small>
+                <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body">
+                <strong>{{message}}</strong>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+<div class="bg-dark container p-3 rounded-pill text-white mb-4 border btnGroup" style="background-image: linear-gradient(to bottom right, #14131373, #352d2d6b);">
+    <div class="d-flex justify-content-center align-items-center mx-auto">
+        {% if result_type == "runtime" %}
+            <div class="form-check mx-2">
+                <input class="form-check-input" type="radio" name="exampleRadios" id="radio_runtime" value="Runtime" checked>
+                <label class="form-check-label" for="radio_runtime">Runtime</label>
+            </div>
+            <div class="form-check mx-2">
+                <input class="form-check-input" type="radio" name="exampleRadios" id="radio_static" value="Static">
+                <label class="form-check-label" for="radio_static">Static</label>
+            </div>
+        {% else %}
+            <div class="form-check mx-2">
+                <input class="form-check-input" type="radio" name="exampleRadios" id="radio_runtime" value="Runtime">
+                <label class="form-check-label" for="radio_runtime">Runtime</label>
+            </div>
+            <div class="form-check mx-2">
+                <input class="form-check-input" type="radio" name="exampleRadios" id="radio_static" value="Static" checked>
+                <label class="form-check-label" for="radio_static">Static</label>
+            </div>
+        {% endif %}
+
+        <button class="btn text-white mx-2" id="download_result">
+            Download Result
+        </button>
+        
+
+        <label style="font-size: x-small;">66.135.27.15:12345 | token:{{token}}</label>
+    </div>
+    <div class="d-flex justify-content-center align-items-center mx-auto grid grid-cols-4 gap-4">
+        <form action="/user/upload" method="post" enctype="multipart/form-data" style="display: inline;">
+            <div class = "grid grid-cols-2 gap-2">
+                <input id="fileInput" name="file[]"  type="file" class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" aria-describedby="file_input_help" multiple>
+                <input type="submit" id="file-uploader" class="btn btn-success" value="Upload Files">
+            </div>
+        </form>
+        
+        <div style="display: inline;">
+            <div class = "grid grid-cols-2 gap-2">
+                <input class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" aria-describedby="file_input_help" id="folderInput" type="file"  webkitdirectory directory multiple>
+                <button onclick="uploadFolder()" class="btn btn-success" >Upload Folder</button>
+            </div>
+        </div>
+
+        <div style="display: inline;">
+            <div class = "grid grid-cols-1">
+                <button onclick="deleteFile()" class="btn btn-secondary" >Delete</button>
+            </div>
+        </div>
+    </div>
+    <div class="p-2">
+        <div class="progress" style="display: none;">
+            <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-4">
+            <div style="background-image: linear-gradient(to bottom right, #292727, #777777);">
+                 <div class="tblStyle">
+                    <!-- First DataTable -->
+                    <table id="table1" class="table1" style="overflow: auto;">
+                        <thead>
+                            <tr>
+                                <th>RuleName</th>
+                                <th>Counts</th>
+                                <th>FalsePositives</th>
+                                <th>RuleId</th>
+                                <!-- Add more columns as needed -->
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in table1_data %}
+                                <tr>
+                                    <td>{{ row.RuleName }}</td>
+                                    <td>{{ row.Counts }}</td>
+                                    <td>{{ row.FalsePositives }}</td>
+                                    <td>{{ row.RuleId }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+           
+        </div>
+        <div class="col-2">
+            <div style="background-image: linear-gradient(to bottom right, #292727, #777777);">
+                 <div class="tblStyle">
+                    <!-- First DataTable -->
+                    <table id="table3" class="table1" style="overflow: auto;">
+                        <thead>
+                            <tr>
+                                <th>FileName</th>
+                                <th>RuleName</th>
+                                <th>RuleId</th>
+                                <!-- Add more columns as needed -->
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in filtered_data %}
+                                <tr>
+                                    <td>{{ row.EventFileName }}</td>
+                                    <td>{{ row.RuleName }}</td>
+                                    <td>{{ row.RuleId }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+            </div>
+            </div>
+        </div>
+        <div class="col-6">
+            <div style="background-image: linear-gradient(to bottom right, #292727, #777777);">
+                <div class="tblStyle">
+                <!-- Second DataTable -->
+                    <table id="table2" class="datatable2 display" style=" overflow: auto;">
+                        <thead>
+                            <tr>
+                                <th>DateTime</th>
+                                <th>EventID</th>
+                                <th>User</th>
+                                <th>Other</th>
+                                <th>RuleId</th>
+                                <!-- Add more columns as needed -->
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function uploadFolder() {
+        const folderInput = document.getElementById('folderInput');
+        const files = folderInput.files;
+
+        if (files.length === 0) {
+            alert('Please select a folder.');
+            return;
+        }
+
+        const formData = new FormData();
+
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            formData.append('files[]', file, file.webkitRelativePath);
+        }
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', '/user/upload_folder', true);
+        xhr.setRequestHeader('enctype', 'multipart/form-data');
+
+        xhr.onreadystatechange = function(event) {
+            if (this.readyState == 4 && this.status == 200) {
+                setTimeout(() => location.href = 'static', 1000)
+            }
+        };
+
+
+        xhr.onprogress = (event) => {
+            if (event.lengthComputable) {
+                const loaded = event.loaded;
+                const total = event.total;
+                $(".progress-bar").attr('style', `width: ${total / loaded * 100}%`);
+            }
+        };
+
+        $(".progress").attr("style", '')
+        xhr.send(formData);
+        // fetch('/user/upload_folder', {
+        //     method: 'POST',
+        //     body: formData
+        // })
+        // .then(response => {
+        //     if (!response.ok) {
+        //         throw new Error('Network response was not ok');
+        //     }
+        //     return response.text();
+        // })
+        // .then(data => {
+        //     location.href = 'static'
+        //     console.log(data); // Handle response from server
+        // })
+        // .catch(error => {
+        //     console.error('There was a problem with your fetch operation:', error);
+        // });
+    }
+
+    function deleteFile() {
+
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', '/user/delete_file', true);
+        xhr.setRequestHeader('enctype', 'multipart/form-data');
+
+        xhr.onreadystatechange = function(event) {
+            if (this.readyState == 4 && this.status == 200) {
+                setTimeout(() => location.href = 'static', 1000)
+            }
+        };
+
+        xhr.send();
+    }
+
+    function downloadCSV(jsonData, fileName) {
+        // Convert JSON to CSV format
+        const replacer = (key, value) => value === null ? '' : value;
+        const header = Object.keys(jsonData[0]);
+        let csv = jsonData.map(row => header.map(fieldName => JSON.stringify(row[fieldName], replacer)).join(','));
+        csv.unshift(header.join(','));
+        csv = csv.join('\r\n');
+
+        // Create a Blob with the CSV data
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+
+        // Create a link and trigger the download
+        const link = document.createElement("a");
+        if (link.download !== undefined) {
+            const url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", fileName);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    }
+
+    function listNodesAsString(obj, parentKey = '', result = '', excludeKeys = []) {
+        for (const key in obj) {
+            if (!obj.hasOwnProperty(key)) continue;
+            if (excludeKeys.includes(key)) continue; // Exclude specific keys
+
+            const currentKey = parentKey ? `${parentKey}.${key}` : key;
+
+            if (typeof obj[key] === 'object' && obj[key] !== null) {
+                result = listNodesAsString(obj[key], currentKey, result, excludeKeys);
+            } else {
+                if (obj[key] !== '' && obj[key] !== null) { // Exclude empty values
+                    result += `(${currentKey} : ${obj[key]})<br/>`;  // Add to string
+                }
+            }
+        }
+        return result;
+    }
+
+    function update_table2(table2, RuleName) {
+        var data2 = {{ table2_data | tojson | safe }}
+        // Clear existing data in the second table
+        table2.clear().draw();
+
+        // Filter data in the second table based on 'RuleName'
+        var filteredData = data2.filter(function(row) {
+            if (RuleName == "")
+            {
+                return true;
+            }
+
+            return row["RuleName"] === RuleName;
+        });
+
+        filteredData.forEach((row, index, array) => {
+            
+            var Other = listNodesAsString(row, '', '', ["RuleId", "User", "UserName", "SubjectUserName", "Timestamp", "EventID", "Hashes", "FalsePositives", "RuleName"]);
+            filteredData[index]['Other'] = Other;
+
+            User = row["User"];
+            if (User == "")
+            {
+                if (row["UserName"] != undefined && JSON.stringify(row["UserName"]).trim() != '[]' && JSON.stringify(row["UserName"]).trim() != '')
+                {
+                    User = row["UserName"];
+                }
+                else if (row["SubjectUserName"] != undefined && JSON.stringify(row["SubjectUserName"]).trim() != '[]' && JSON.stringify(row["SubjectUserName"]).trim() != '')
+                {
+                    User = row["SubjectUserName"];
+                }
+            }
+
+            filteredData[index]['User'] = User;
+        });
+
+        // Define the desired key order
+        const desiredKeyOrder = ["Timestamp", "EventID", "User", "Other", "RuleId"];
+
+        // Create a new array with arrays having values in the desired order
+        const reorderedArray = filteredData.map(obj =>
+            desiredKeyOrder.map(key => String(obj[key]))
+        );
+
+        // Add the filtered data to the second table
+        table2.rows.add(reorderedArray).draw();
+    }
+
+    function update_table3(table3, RuleName) {
+        var data2 = {{ table2_data | tojson | safe }}
+
+        // Clear existing data in the second table
+        table3.clear().draw();
+
+        // Filter data in the second table based on 'RuleName'
+        var filteredData = data2.filter(function(row) {
+            if (RuleName == "")
+            {
+                return true;
+            }
+
+            return row["RuleName"] === RuleName;
+        });
+
+        // Define the desired key order
+        const desiredKeyOrder = ["EventFileName", "RuleName", "RuleId"];
+
+        // Create a new array with arrays having values in the desired order
+        const reorderedArray = filteredData.map(obj =>
+            desiredKeyOrder.map(key => String(obj[key]))
+        );
+
+        const newArray = reorderedArray.filter(function(subArray) {
+            return subArray[0] !== '';
+        });
+
+        const uniqueArray = newArray.filter((arr, index) => {
+            const firstValue = arr[0];
+            return index === newArray.findIndex((a) => a[0] === firstValue);
+        });
+
+        // Add the filtered data to the second table
+        table3.rows.add(uniqueArray).draw();
+    }
+    
+    $(document).ready(function() {
+        // Initialize DataTables
+        var table1 = $('#table1').DataTable();
+        var table2 = $('#table2').DataTable();
+
+        var table3 = $('#table3').DataTable({
+            "language": {
+                "lengthMenu": " ",
+                "search": "",
+                "info": "",
+                "infoEmpty": "",
+                "infoFiltered": ""
+            }
+        });
+
+
+        // Handle row click in the first table
+        $('#table1 tbody').on('click', 'tr', function() {
+            if ($(this).hasClass('selected')) {
+                $(this).removeClass('selected');
+            } else {
+                table1.$('tr.selected').removeClass('selected');
+                $(this).addClass('selected');
+            }
+
+            // Get data from the clicked row
+            var rowData = table1.row(this).data();
+            var RuleName = rowData[0]; // Assuming 'RuleName' is the first column
+            var RuleId = parseInt(rowData[3], 10); // Assuming 'RuleName' is the first column
+            table2.clear().draw();
+            // update_table3(table3, RuleId);
+            update_table3(table3, RuleName);
+        });
+
+        // Handle row click in the first table
+        $('#table3 tbody').on('click', 'tr', function() {
+            if ($(this).hasClass('selected')) {
+                $(this).removeClass('selected');
+            } else {
+                table3.$('tr.selected').removeClass('selected');
+                $(this).addClass('selected');
+            }
+
+            // Get data from the clicked row
+            var rowData = table3.row(this).data();
+            // var RuleId = parseInt(rowData[1], 10); // Assuming 'RuleName' is the first column
+            var RuleName = rowData[1]; // Assuming 'RuleName' is the first column
+            update_table2(table2, RuleName);
+        });
+
+        update_table2(table2, "");
+
+        // Hide the second column in both tables
+        table1.column(3).visible(false);
+        table2.column(4).visible(false);
+        table3.column(1).visible(false);
+        table3.column(2).visible(false);
+
+        document.getElementById('download_result').addEventListener('click', function () {
+            
+            const fileName = "data.csv"; // The CSV file name
+            downloadCSV(data2, fileName);
+        });
+
+        $('#radio_runtime').click(function() {
+            window.location.href = '/user/dashboard/runtime';
+        });
+
+        $('#radio_static').click(function() {
+            window.location.href = '/user/dashboard/static';
+        });
+
+    });
+</script>
+{% endblock content %}
