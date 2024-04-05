@@ -108,6 +108,7 @@
         $(".progress").attr("style", '');
         xhr.send(formData);
     }
+
     function Save() {
         // Get the table reference
         var table = document.getElementById("table1");
@@ -126,7 +127,7 @@
                 var headerText = table.rows[0].cells[j].textContent.trim();
                 if (j == 1) {
                     dataObject["enable"] = cell.children[0].checked;
-                } else {                   
+                } else {
                     dataObject["enable"] = cell.textContent.trim();
                 }
             }
@@ -137,7 +138,7 @@
 
         const xhr = new XMLHttpRequest();
         xhr.open('POST', '/admin/save_changed', true);
-        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.setRequestHeader('Content-Type',  'application/json');
 
         xhr.onreadystatechange = function(event) {
             if (this.readyState == 4 && this.status == 200) {
@@ -163,4 +164,5 @@
         });
     });
 </script>
-{% endblock content %}
+
+{% endblock %}

@@ -1,0 +1,12 @@
+__pycache__
+data_log
+result
+sigma
+windows
+venv
+venv_ThreatHound
+venv_webviewer
+ThreatHound-main.zip
+test
+*.evtx
+*.csv
