@@ -554,51 +554,47 @@ def userUpdateProfile():
 
 @app.route('/user/upload_files', methods=['POST'])
 def upload_files():
-    if not session.get('user_id'):
+    if 'user_id' not in session:
+        flash('User not logged in.', 'error')
+        return redirect('/user/')  # Redirect to user login page
+
+    user_id = session['user_id']
+    user = User.query.get(user_id)
+
+    if not user:
+        flash('User not found.', 'error')
         return redirect('/user/')
 
-    if session.get('user_id'):
-        id=session.get('user_id')
-
-    users=User.query.get(id)
-
-    if users.token == "":
+    if not user.token:
+        flash('User token is missing.', 'error')
         return redirect('/user/')
-
-    save_dir = "data_log"
-    os.makedirs(save_dir, exist_ok=True)
-    save_dir = os.path.join(save_dir, users.token)
-    os.makedirs(save_dir, exist_ok=True)
-    save_dir = os.path.join(save_dir, "static")
-    os.makedirs(save_dir, exist_ok=True)
 
     if 'files[]' not in request.files:
-        flash('No files were uploaded','error')
+        flash('No files were uploaded.', 'error')
         return redirect('/user/dashboard/static')
 
     files = request.files.getlist('files[]')
 
-    if len(files) == 0:
-        flash('No files were uploaded','error')
+    if not files:
+        flash('No files were uploaded.', 'error')
         return redirect('/user/dashboard/static')
 
-
     for file in files:
-        # Save the file to a location or perform desired operations
         if file.filename == '':
-            return redirect('/user/dashboard/static')
+            flash('Empty file name.', 'error')
+            continue
 
-        if file and allowed_file(file.filename):
+        if allowed_file(file.filename):
             filename = secure_filename(file.filename)
-            file.save(os.path.join(save_dir, filename))
+            file_path = os.path.join("data_log", user.token, "static", filename)
+            file.save(file_path)
+            flash(f'File "{filename}" uploaded successfully.', 'success')
         else:
-            flash('File type not allowed','error')
+            flash(f'File "{file.filename}" type not allowed.', 'error')
 
-    flash('Upload Successfully','success')
+    return redirect('/user/dashboard/static')
 
-    write_file("performed.txt", "uploaded")
 
-    return redirect('/user/dashboard/static')  # Replace with your HTML file
 
 @app.route('/user/upload_folder', methods=['POST'])
 def upload_folder():
