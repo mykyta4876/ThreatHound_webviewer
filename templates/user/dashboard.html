@@ -70,10 +70,16 @@ $(document).ready(function(){
         <label style="font-size: x-small;">66.135.27.15:12345 | token:{{token}}</label>
     </div>
     <div class="d-flex justify-content-center align-items-center mx-auto grid grid-cols-4 gap-4">
-        <form action="/user/upload" method="post" enctype="multipart/form-data" style="display: inline;">
+        <form enctype="multipart/form-data" style="display: inline;">
+            <!--
             <div class = "grid grid-cols-2 gap-2">
                 <input id="fileInput" name="file[]"  type="file" class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" aria-describedby="file_input_help" multiple>
                 <input type="submit" id="file-uploader" class="btn btn-success" value="Upload Files">
+            </div>
+            -->
+            <div class = "grid grid-cols-2 gap-2">
+                <input id="fileInput" type="file" class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" aria-describedby="file_input_help" multiple>
+                <input onclick="uploadFiles()" id="file-uploader" class="btn btn-success" value="Upload Files">
             </div>
         </form>
         
@@ -179,7 +185,12 @@ $(document).ready(function(){
 </div>
 
 <script>
-    function uploadFolder() {
+    // Using setTimeout
+    function sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    async function uploadFolder() {
         const folderInput = document.getElementById('folderInput');
         const files = folderInput.files;
 
@@ -194,13 +205,14 @@ $(document).ready(function(){
             const file = files[i];
             formData.append('files[]', file, file.webkitRelativePath);
         }
+
         const xhr = new XMLHttpRequest();
         xhr.open('POST', '/user/upload_folder', true);
         xhr.setRequestHeader('enctype', 'multipart/form-data');
 
         xhr.onreadystatechange = function(event) {
             if (this.readyState == 4 && this.status == 200) {
-                setTimeout(() => location.href = 'static', 1000)
+                //setTimeout(() => location.href = 'static', 1000)
             }
         };
 
@@ -209,12 +221,48 @@ $(document).ready(function(){
             if (event.lengthComputable) {
                 const loaded = event.loaded;
                 const total = event.total;
-                $(".progress-bar").attr('style', `width: ${total / loaded * 100}%`);
+                $(".progress-bar").attr('style', `width: ${total / loaded * 90}%`);
             }
         };
 
         $(".progress").attr("style", '')
         xhr.send(formData);
+
+        
+        while(true)
+        {
+            if ($(".progress").attr('style') === "display: none;")
+                break
+
+            const xhr1 = new XMLHttpRequest();
+            xhr1.open('POST', '/user/performed', true);
+            xhr1.setRequestHeader('Content-Type', 'multipart/form-data');
+
+            xhr1.onreadystatechange = function(event) {
+                if (this.readyState == 4) {
+                    if (this.status == 200) {
+                        // Successful response
+                        const responseJson = xhr1.responseText;
+
+                        if (responseJson === "ok")
+                        {
+                            $(".progress").attr("style", 'display: none;');
+                            setTimeout(() => location.href = 'static', 1000)
+                        }
+                    } else {
+                        // Error handling
+                        console.error('Error:', xhr1.status);
+                    }
+                }
+            };
+
+            xhr1.send();
+
+            await sleep(1000); // sleep for 1 second (1000 milliseconds)
+        }
+        
+        
+
         // fetch('/user/upload_folder', {
         //     method: 'POST',
         //     body: formData
@@ -232,6 +280,78 @@ $(document).ready(function(){
         // .catch(error => {
         //     console.error('There was a problem with your fetch operation:', error);
         // });
+    }
+
+    async function uploadFiles() {
+        const fileInput = document.getElementById('fileInput');
+        const files = fileInput.files;
+
+        if (files.length === 0) {
+            alert('Please select files.');
+            return;
+        }
+
+        const formData = new FormData();
+
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            formData.append('files[]', file, file.webkitRelativePath);
+        }
+
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', '/user/upload_files', true);
+        xhr.setRequestHeader('enctype', 'multipart/form-data');
+
+        xhr.onreadystatechange = function(event) {
+            if (this.readyState == 4 && this.status == 200) {
+                //setTimeout(() => location.href = 'static', 1000)
+            }
+        };
+
+
+        xhr.onprogress = (event) => {
+            if (event.lengthComputable) {
+                const loaded = event.loaded;
+                const total = event.total;
+                $(".progress-bar").attr('style', `width: ${total / loaded * 90}%`);
+            }
+        };
+
+        $(".progress").attr("style", '')
+        xhr.send(formData);
+
+        while(true)
+        {
+            if ($(".progress").attr('style') === "display: none;")
+                break
+
+            const xhr1 = new XMLHttpRequest();
+            xhr1.open('POST', '/user/performed', true);
+            xhr1.setRequestHeader('Content-Type', 'multipart/form-data');
+
+            xhr1.onreadystatechange = function(event) {
+                if (this.readyState == 4) {
+                    if (this.status == 200) {
+                        // Successful response
+                        const responseJson = xhr1.responseText;
+
+                        if (responseJson === "ok")
+                        {
+                            $(".progress").attr("style", 'display: none;');
+                            setTimeout(() => location.href = 'static', 1000)
+                        }
+                    } else {
+                        // Error handling
+                        console.error('Error:', xhr1.status);
+                    }
+                }
+            };
+
+            xhr1.send();
+
+            await sleep(1000); // sleep for 1 second (1000 milliseconds)
+        }
+        
     }
 
     function deleteFile() {

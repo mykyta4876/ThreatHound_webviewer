@@ -10,13 +10,14 @@ import string
 import csv
 import io
 from werkzeug.utils import secure_filename
+from flask import jsonify
 
-ALLOWED_EXTENSIONS = {'csv', 'evtx'}
+ALLOWED_EXTENSIONS = {'csv', 'evtx', 'yml', 'txt'}
 
 DIR_RESULT = "result"
 DIR_DATA = "data_log"
 DIR_WINDOWS = "windows"
-MAX_CONTENT_LENGTH = 32 * 1024 * 1024  # Set the maximum file size to 16 MB
+MAX_CONTENT_LENGTH = 100 * 1024 * 1024  # Set the maximum file size to 16 MB
 
 app=Flask(__name__)
 app.config["SECRET_KEY"]='65b0b774279de460f1cc5c92'
@@ -139,7 +140,8 @@ def adminSigmaRule():
         return redirect('/admin/')
     
     table1_data = []
-    
+
+    # Read contents of sigmarule.txt file
     file_sigmarule = "sigma-rule.txt"
     if os.path.exists(file_sigmarule) == False:
         flash('no result','error')
@@ -179,7 +181,7 @@ def upload_folder_admin():
 
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
-            # file.save(os.path.join(save_dir, filename))
+            file.save(os.path.join(DIR_WINDOWS, filename))
         else:
             flash('File type not allowed','error')
 
@@ -188,16 +190,51 @@ def upload_folder_admin():
     return redirect('/admin/sigmarule')  # Replace with your HTML file
 
 @app.route('/admin/save_changed', methods=['POST'])
-def save_updated():
+def save_changed():
     if not session.get('admin_id'):
         return redirect('/admin/')
 
-    json_data = request.get_json()
+    if request.is_json:
+        # Extract the JSON data from the request
+        json_data = request.json
 
-    with open("sigma-rule.txt", 'w') as json_file:
-        json.dump(json_data, json_file, indent=2)
+        # Load existing data from the file
+        with open("sigma-rule.txt", 'r') as json_file:
+            existing_data = json.load(json_file)
 
-    return render_template('admin/sigmarule.html', table1_data=json_data)
+        # Update the enable field based on the received data
+        for received_item in json_data:
+            # Ensure the received item has a 'title' key
+            if 'title' not in received_item:
+                flash('Invalid data format: Missing "title" key', 'error')
+                return redirect('/admin/sigmarule')
+            
+            # Find the corresponding item in the existing data
+            found = False
+            for existing_item in existing_data:
+                if 'title' not in existing_item:
+                    flash('Existing data format error: Missing "title" key', 'error')
+                    flash(received_item['title'])
+                    return redirect('/admin/sigmarule')
+                if received_item['title'] == existing_item['title']:
+                    existing_item['enable'] = received_item.get('enable', True)
+                    found = True
+                    break
+            
+            if not found:
+                flash(f'Item with title "{received_item["title"]}" not found in existing data', 'error')
+                return redirect('/admin/sigmarule')
+
+        # Write the updated data back to the file
+        with open("sigma-rule.txt", 'w') as json_file:
+            json.dump(existing_data, json_file, indent=2)
+
+        flash('Changes saved successfully', 'success')
+        return redirect('/admin/sigmarule')
+    else:
+        flash('Invalid data format', 'error')
+        return redirect('/admin/sigmarule')
+
 
 @app.route('/admin/approve-user/<int:id>')
 def adminApprove(id):
@@ -324,6 +361,11 @@ def read_file(filepath):
         exit(0)
 
     return str_content
+
+def write_file(filepath, content):
+    f = open(filepath, mode="w", encoding="utf-8")
+    str_content = f.write(content)
+    f.close()
 
 # user dashboard
 @app.route('/user/dashboard')
@@ -510,8 +552,8 @@ def userUpdateProfile():
     else:
         return render_template('user/update-profile.html',title="Update Profile",users=users)
 
-@app.route('/user/upload', methods=['POST'])
-def upload_file():
+@app.route('/user/upload_files', methods=['POST'])
+def upload_files():
     if not session.get('user_id'):
         return redirect('/user/')
 
@@ -530,24 +572,31 @@ def upload_file():
     save_dir = os.path.join(save_dir, "static")
     os.makedirs(save_dir, exist_ok=True)
 
-    if request.method == 'POST':
-        if 'file[]' not in request.files:
+    if 'files[]' not in request.files:
+        flash('No files were uploaded','error')
+        return redirect('/user/dashboard/static')
+
+    files = request.files.getlist('files[]')
+
+    if len(files) == 0:
+        flash('No files were uploaded','error')
+        return redirect('/user/dashboard/static')
+
+
+    for file in files:
+        # Save the file to a location or perform desired operations
+        if file.filename == '':
             return redirect('/user/dashboard/static')
 
-        uploaded_files = request.files.getlist('file[]')
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(save_dir, filename))
+        else:
+            flash('File type not allowed','error')
 
-        for file in uploaded_files:
-            # Save the file to a location or perform desired operations
-            if file.filename == '':
-                return redirect('/user/dashboard/static')
+    flash('Upload Successfully','success')
 
-            if file and allowed_file(file.filename):
-                filename = secure_filename(file.filename)
-                file.save(os.path.join(save_dir, filename))
-            else:
-                flash('File type not allowed','error')
-
-        flash('Upload Successfully','success')
+    write_file("performed.txt", "uploaded")
 
     return redirect('/user/dashboard/static')  # Replace with your HTML file
 
@@ -581,6 +630,7 @@ def upload_folder():
         flash('No files were uploaded','error')
         return redirect('/user/dashboard/static')
 
+
     for file in files:
         # Save the file to a location or perform desired operations
         if file.filename == '':
@@ -593,6 +643,8 @@ def upload_folder():
             flash('File type not allowed','error')
 
     flash('Upload Successfully','success')
+
+    write_file("performed.txt", "uploaded")
 
     return redirect('/user/dashboard/static')  # Replace with your HTML file
 
@@ -626,6 +678,21 @@ def delete_file():
         return "Folder not found."
     except Exception as e:
         return f"Error deleting files: {e}"
+
+@app.route('/user/performed', methods=['POST'])
+def performed():
+    if not session.get('user_id'):
+        return redirect('/user/')
+
+    if session.get('user_id'):
+        id=session.get('user_id')
+
+    result = read_file("performed.txt")
+
+    if os.path.isfile("performed.txt") and result == "ok":
+        os.remove("performed.txt")
+    
+    return result
 
 if __name__=="__main__":
     app.run(host='127.0.0.1', port=5000)
